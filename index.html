@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FoodLoop - Turning Waste into Worth</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cabinet+Grotesk:wght@400;500;700;900&family=Crimson+Pro:wght@400;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Three.js for 3D Theme -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
+</head>
+
+<body>
+    <!-- 3D Background Canvas -->
+    <canvas id="three-bg"></canvas>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo">Food<span>Loop</span></div>
+            <ul class="nav-links">
+                <li><a href="#problem">Problem</a></li>
+                <li><a href="#solution">Solution</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#how-it-works">How It Works</a></li>
+                <li><a href="#impact">Impact</a></li>
+                <li><a href="#" onclick="openLoginModal(); return false;"
+                        style="background: var(--accent-lime); color: var(--deep-forest); padding: 0.6rem 1.5rem; border-radius: 25px; font-weight: 700;">Login</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- User Info Bar (shown when logged in) -->
+    <div id="userInfoBar" class="user-info-bar">
+        <div class="user-avatar" id="userAvatar">👤</div>
+        <div class="user-details">
+            <span class="user-name" id="userName">User Name</span>
+            <span class="user-type-label" id="userTypeLabel">Donor</span>
+        </div>
+        <button class="btn-logout" onclick="logout()">Logout</button>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notificationContainer" class="notification-container"></div>
+
+    <!-- My Food Dashboard -->
+    <div id="myFoodDashboard" class="my-food-dashboard" style="display: none;">
+        <button class="dashboard-toggle-btn" onclick="toggleDashboard()">
+            📋
+            <span id="dashboardBadge" class="dashboard-badge" style="display: none;">0</span>
+        </button>
+    </div>
+
+    <!-- Dashboard Panel -->
+    <div id="dashboardPanel" class="dashboard-panel">
+        <div class="dashboard-header">
+            <h2 id="dashboardTitle">My Dashboard</h2>
+            <p id="dashboardSubtitle">Track your food</p>
+            <button class="dashboard-close" onclick="toggleDashboard()">×</button>
+        </div>
+        <div class="dashboard-content" id="dashboardContent">
+            <!-- Content will be dynamically loaded -->
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1>Connecting <span class="highlight">Surplus Food</span> with Those in Need — In Real Time</h1>
+                <p>Transform campus and event food waste into community impact. FoodLoop makes real-time food sharing
+                    simple, sustainable, and rewarding.</p>
+                <div class="cta-buttons">
+                    <a href="#" class="btn btn-primary">Donate Food</a>
+                    <a href="#" class="btn btn-secondary">Find Food Nearby</a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">40%</div>
+                        <div class="stat-label">Food Wasted at Events</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">12K+</div>
+                        <div class="stat-label">Meals Saved</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">85%</div>
+                        <div class="stat-label">Landfill Reduction</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">500+</div>
+                        <div class="stat-label">Active Users</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Problem Section -->
+    <section id="problem">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">The Food Waste Crisis</h2>
+                <p class="section-subtitle">Every year, millions of meals go to waste while people go hungry</p>
+            </div>
+            <div class="problem-grid">
+                <div class="problem-card">
+                    <span class="problem-icon">🎉</span>
+                    <h3>Events Waste 30-40%</h3>
+                    <p>Weddings, birthdays, promotional events, and campus gatherings generate massive surplus food that
+                        ends up in landfills instead of feeding people.</p>
+                </div>
+                <div class="problem-card">
+                    <span class="problem-icon">⏱️</span>
+                    <h3>No Real-Time System</h3>
+                    <p>Current food donation methods are slow, unreliable, and don't connect surplus food with those who
+                        need it when it matters most.</p>
+                </div>
+                <div class="problem-card">
+                    <span class="problem-icon">🌍</span>
+                    <h3>Environmental Impact</h3>
+                    <p>Food waste in landfills produces methane, contributing to climate change while edible food could
+                        nourish communities and reduce carbon footprint.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Solution Section -->
+    <section id="solution">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Meet FoodLoop</h2>
+                <p class="section-subtitle">A mobile-first platform that turns surplus into sustenance</p>
+            </div>
+            <div class="solution-cards">
+                <div class="solution-card">
+                    <h3>For <span>Donors</span></h3>
+                    <ul class="solution-list">
+                        <li>List surplus food in seconds</li>
+                        <li>Upload photos to verify condition</li>
+                        <li>Set pickup time and location</li>
+                        <li>Track your environmental impact</li>
+                        <li>Earn sustainability badges</li>
+                        <li>Build positive reputation</li>
+                    </ul>
+                </div>
+                <div class="solution-card">
+                    <h3>For <span>Recipients</span></h3>
+                    <ul class="solution-list">
+                        <li>View nearby available food</li>
+                        <li>Get instant push notifications</li>
+                        <li>Reserve meals quickly</li>
+                        <li>Navigate to pickup locations</li>
+                        <li>Rate and review experiences</li>
+                        <li>Access free or low-cost meals</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Powerful Features</h2>
+                <p class="section-subtitle">Technology that makes food sharing seamless</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <span class="feature-icon">📍</span>
+                    <h3>Location Matching</h3>
+                    <p>Geolocation API connects nearby donors and recipients for convenient pickup within your campus or
+                        community.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">⚡</span>
+                    <h3>Real-Time Updates</h3>
+                    <p>Live food listings update instantly, ensuring you always see the most current availability.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">🔔</span>
+                    <h3>Push Notifications</h3>
+                    <p>Firebase-powered alerts notify you the moment food becomes available in your area.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">📷</span>
+                    <h3>Photo Verification</h3>
+                    <p>Upload images to show food quality and condition, building trust and transparency.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">⭐</span>
+                    <h3>Rating System</h3>
+                    <p>Community-driven feedback ensures quality and accountability for all users.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">📦</span>
+                    <h3>Pickup Tracking</h3>
+                    <p>Monitor reservation status and coordinate seamless food collection.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section id="how-it-works">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">How FoodLoop Works</h2>
+                <p class="section-subtitle">Five simple steps from waste to worth</p>
+            </div>
+            <div class="steps-timeline">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Donor Lists Surplus</h3>
+                        <p>Event organizers, hostels, or canteens list available surplus food with photos, quantity, and
+                            pickup details.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Platform Notifies Users</h3>
+                        <p>FoodLoop instantly sends push notifications to nearby students, NGOs, and community members.
+                        </p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Recipient Claims Food</h3>
+                        <p>Users browse available listings, reserve meals, and receive pickup location and timing.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h3>Pickup is Tracked</h3>
+                        <p>Real-time tracking ensures smooth coordination between donors and recipients.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h3>Impact is Measured</h3>
+                        <p>Both parties rate the experience, and sustainability metrics update automatically.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gamification -->
+    <section id="gamification">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Community & Rewards</h2>
+                <p class="section-subtitle">Making sustainability engaging and rewarding</p>
+            </div>
+            <div class="gamification-grid">
+                <div class="game-card">
+                    <span class="game-icon">🏅</span>
+                    <h3>Achievement Badges</h3>
+                    <p>Earn badges for milestones like 10 donations, 50 meals saved, or zero-waste weeks.</p>
+                </div>
+                <div class="game-card">
+                    <span class="game-icon">🏆</span>
+                    <h3>Campus Leaderboard</h3>
+                    <p>Compete with other hostels and students to top the sustainability rankings.</p>
+                </div>
+                <div class="game-card">
+                    <span class="game-icon">🌱</span>
+                    <h3>Impact Tracking</h3>
+                    <p>Monitor your carbon footprint reduction and contribution to food security.</p>
+                </div>
+                <div class="game-card">
+                    <span class="game-icon">📢</span>
+                    <h3>Social Sharing</h3>
+                    <p>Share your impact stories and inspire others to join the movement.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Impact Section -->
+    <section id="impact">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">The FoodLoop Impact</h2>
+                <p class="section-subtitle">Creating value for everyone</p>
+            </div>
+            <div class="impact-grid">
+                <div class="impact-column">
+                    <h3><span>🌍</span> For Society & Environment</h3>
+                    <ul class="impact-list">
+                        <li>Significantly reduce campus and event food waste</li>
+                        <li>Support institutional zero-waste and sustainability goals</li>
+                        <li>Lower greenhouse gas emissions from landfills</li>
+                        <li>Promote circular economy and conscious consumption</li>
+                        <li>Strengthen community bonds through shared values</li>
+                        <li>Contribute to UN Sustainable Development Goals</li>
+                    </ul>
+                </div>
+                <div class="impact-column">
+                    <h3><span>💚</span> For Users</h3>
+                    <ul class="impact-list">
+                        <li>Access free or low-cost nutritious meals</li>
+                        <li>Save money on daily food expenses</li>
+                        <li>Build positive reputation as responsible citizens</li>
+                        <li>Earn sustainability recognition and certificates</li>
+                        <li>Connect with like-minded community members</li>
+                        <li>Make tangible difference in food security</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tech Stack -->
+    <section id="tech-stack">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Built With Modern Technology</h2>
+                <p class="section-subtitle">Scalable, secure, and reliable infrastructure</p>
+            </div>
+            <div class="tech-grid">
+                <div class="tech-category">
+                    <h3>Frontend</h3>
+                    <ul class="tech-list">
+                        <li>HTML5 & CSS3</li>
+                        <li>JavaScript (ES6+)</li>
+                        <li>React.js</li>
+                        <li>Responsive Design</li>
+                        <li>Progressive Web App</li>
+                    </ul>
+                </div>
+                <div class="tech-category">
+                    <h3>Backend & Database</h3>
+                    <ul class="tech-list">
+                        <li>Node.js</li>
+                        <li>Express.js</li>
+                        <li>MongoDB</li>
+                        <li>RESTful API</li>
+                        <li>JWT Authentication</li>
+                    </ul>
+                </div>
+                <div class="tech-category">
+                    <h3>Cloud & Services</h3>
+                    <ul class="tech-list">
+                        <li>Firebase Cloud Messaging</li>
+                        <li>Geolocation API</li>
+                        <li>AWS / Azure / Google Cloud</li>
+                        <li>Image Processing</li>
+                        <li>Real-time Data Sync</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section id="cta">
+        <div class="container">
+            <h2 class="section-title">Be Part of the FoodLoop Movement</h2>
+            <p class="section-subtitle">Join thousands making a difference, one meal at a time. Together, we can turn
+                waste into worth and build a sustainable future.</p>
+            <div class="cta-buttons">
+                <a href="#" class="btn btn-primary">Start Donating Food</a>
+                <a href="#" class="btn btn-secondary">Find Food Near You</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Donation Form Modal -->
+    <div id="donationModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Donate Food</h2>
+                <p>Help reduce waste and feed those in need</p>
+                <button class="close-modal" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="donationForm">
+                    <div class="form-group">
+                        <label>Food Name <span class="required">*</span></label>
+                        <input type="text" class="form-input" name="foodName"
+                            placeholder="e.g., Vegetable Biryani, Paneer Curry" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Food Type <span class="required">*</span></label>
+                            <select class="form-select" name="foodType" required>
+                                <option value="">Select Type</option>
+                                <option value="vegetarian">Vegetarian</option>
+                                <option value="non-vegetarian">Non-Vegetarian</option>
+                                <option value="vegan">Vegan</option>
+                                <option value="mixed">Mixed</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Quantity <span class="required">*</span></label>
+                            <input type="text" class="form-input" name="quantity" placeholder="e.g., 20 plates, 5kg"
+                                required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea class="form-textarea" name="description"
+                            placeholder="Describe the food items, preparation time, ingredients, etc."></textarea>
+                        <p class="form-hint">Include any important details like allergens or spice level</p>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Best Before <span class="required">*</span></label>
+                            <input type="datetime-local" class="form-input" name="bestBefore" required>
+                            <p class="form-hint">When should the food be picked up by?</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Food Condition <span class="required">*</span></label>
+                            <select class="form-select" name="condition" required>
+                                <option value="">Select Condition</option>
+                                <option value="freshly-prepared">Freshly Prepared</option>
+                                <option value="few-hours-old">Few Hours Old</option>
+                                <option value="packaged">Packaged</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Pickup Location <span class="required">*</span></label>
+                        <input type="text" class="form-input" name="location" id="locationInput"
+                            placeholder="e.g., Main Campus Hostel, Event Hall B" required>
+                        <div id="donation-map"></div>
+                        <p class="form-hint">Click on map to pin location, or type address above</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Organization/Event</label>
+                        <input type="text" class="form-input" name="organization"
+                            placeholder="e.g., Student Hostel, Wedding Event, College Fest">
+                        <p class="form-hint">Optional: Help us understand where the food is coming from</p>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Contact Number</label>
+                            <input type="tel" class="form-input" name="contactNumber"
+                                placeholder="e.g., +91 98765 43210">
+                            <p class="form-hint">Optional: So recipients can contact you directly</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Price</label>
+                            <input type="text" class="form-input" name="price"
+                                placeholder="e.g., ₹50, ₹100, or leave blank for free">
+                            <p class="form-hint">Optional: Enter price or leave blank for free donation</p>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Upload Food Photos</label>
+                        <div class="file-upload-wrapper">
+                            <label for="foodImages" class="file-upload-label">
+                                <span>📷</span>
+                                <div>
+                                    <div style="font-size: 1.1rem;">Click to upload photos</div>
+                                    <div style="font-size: 0.9rem; opacity: 0.7;">Help recipients see the food quality
+                                    </div>
+                                </div>
+                            </label>
+                            <input type="file" id="foodImages" class="file-input" accept="image/*" multiple
+                                onchange="previewImages(event)">
+                        </div>
+                        <div id="imagePreview" class="image-preview"></div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
+                        <button type="submit" class="btn-submit">List Food & Donate</button>
+                    </div>
+                </form>
+
+                <div id="successMessage" class="success-message">
+                    <div class="success-icon">✅</div>
+                    <h3>Food Listed Successfully!</h3>
+                    <p>Your donation is now live. Nearby users will be notified shortly.</p>
+                    <button class="btn btn-primary" onclick="closeModal()">Done</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login/Signup Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="authTitle">Welcome to FoodLoop</h2>
+                <p>Join the movement to reduce food waste</p>
+                <button class="close-modal" onclick="closeLoginModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="login-container">
+                    <!-- User Type Selection -->
+                    <div>
+                        <h3
+                            style="font-family: 'Cabinet Grotesk', sans-serif; font-size: 1.3rem; margin-bottom: 1rem; text-align: center; color: var(--primary-green);">
+                            I am a...</h3>
+                        <div class="user-type-selector">
+                            <div class="user-type-card" onclick="selectUserType('donor')">
+                                <div class="user-type-icon">🤲</div>
+                                <h3>Donor</h3>
+                                <p>I want to donate surplus food</p>
+                            </div>
+                            <div class="user-type-card" onclick="selectUserType('recipient')">
+                                <div class="user-type-icon">🍽️</div>
+                                <h3>Recipient</h3>
+                                <p>I want to find food nearby</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Login Form -->
+                    <form id="loginForm" class="login-form">
+                        <div class="form-group">
+                            <label>Email Address <span class="required">*</span></label>
+                            <input type="email" class="form-input" name="email" placeholder="your.email@example.com"
+                                required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Password <span class="required">*</span></label>
+                            <input type="password" class="form-input" name="password" placeholder="Enter your password"
+                                required>
+                        </div>
+
+                        <button type="submit" class="btn-submit">Login</button>
+
+                        <div class="auth-toggle">
+                            Don't have an account? <a onclick="showSignupForm()">Sign Up</a>
+                        </div>
+                    </form>
+
+                    <!-- Signup Form -->
+                    <form id="signupForm" class="login-form">
+                        <div class="form-group">
+                            <label>Full Name <span class="required">*</span></label>
+                            <input type="text" class="form-input" name="fullName" placeholder="Enter your full name"
+                                required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Email Address <span class="required">*</span></label>
+                            <input type="email" class="form-input" name="email" placeholder="your.email@example.com"
+                                required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Phone Number <span class="required">*</span></label>
+                            <input type="tel" class="form-input" name="phone" placeholder="+91 XXXXX XXXXX" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Password <span class="required">*</span></label>
+                            <input type="password" class="form-input" name="password" placeholder="Create a password"
+                                required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Organization/Location (Optional)</label>
+                            <input type="text" class="form-input" name="organization"
+                                placeholder="e.g., XYZ College, ABC Hostel">
+                        </div>
+
+                        <button type="submit" class="btn-submit">Create Account</button>
+
+                        <div class="auth-toggle">
+                            Already have an account? <a onclick="showLoginForm()">Login</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Find Food Nearby Modal -->
+    <div id="findFoodModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Find Food Nearby</h2>
+                <p>Discover available food in your area</p>
+                <button class="close-modal" onclick="closeFindFoodModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="find-food-layout">
+                    <div class="list-column">
+                        <div class="filter-bar">
+                            <button class="filter-btn active" onclick="filterFood('all')">All Food</button>
+                            <button class="filter-btn" onclick="filterFood('vegetarian')">🥗 Veg</button>
+                            <button class="filter-btn" onclick="filterFood('non-vegetarian')">🍖 Non-Veg</button>
+                            <button class="filter-btn" onclick="filterFood('vegan')">🌱 Vegan</button>
+                        </div>
+                        <div id="foodListings" class="food-listings-container">
+                            <!-- Food listings will be dynamically inserted here -->
+                        </div>
+                    </div>
+                    <div class="map-column">
+                        <div id="map-container"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div>
+                <div class="footer-logo">Food<span>Loop</span></div>
+                <p class="footer-about">Turning waste into worth through real-time food sharing. Connecting campuses,
+                    communities, and conscious citizens to create a sustainable future, one meal at a time.</p>
+                <div class="social-icons">
+                    <a href="#" class="social-icon">📘</a>
+                    <a href="#" class="social-icon">🐦</a>
+                    <a href="#" class="social-icon">📷</a>
+                    <a href="#" class="social-icon">💼</a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul class="footer-links">
+                    <li><a href="#problem">The Problem</a></li>
+                    <li><a href="#solution">Our Solution</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#how-it-works">How It Works</a></li>
+                    <li><a href="#impact">Impact</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Contact</h4>
+                <ul class="footer-links">
+                    <li><a href="/cdn-cgi/l/email-protection#b1d9d4dddddef1d7deded5dddedec19fdec3d6"><span
+                                class="__cf_email__"
+                                data-cfemail="472f222b2b2807212828232b28283769283520">[email&#160;protected]</span></a>
+                    </li>
+                    <li><a href="tel:+911234567890">+91 123 456 7890</a></li>
+                    <li>Chameli Devi Group of Institutes</li>
+                    <li>Indore, Madhya Pradesh</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 FoodLoop • IDEATHON 2025 - Chameli Devi Group of Institutes, Indore • Turning Waste into
+                Worth</p>
+        </div>
+    </footer>
+
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+</body>
+
+</html>
+<script src="js/data.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/map.js"></script>
+<script src="js/app.js"></script>
+<script src="js/3d-theme.js"></script>
+</body>
+
+</html>
