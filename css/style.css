@@ -13,6 +13,14 @@
             --shadow-clean: 0 10px 30px rgba(0, 0, 0, 0.04);
             --shadow-hover: 0 15px 45px rgba(0, 0, 0, 0.08);
             --accent-glow: 0 0 15px rgba(16, 185, 129, 0.2);
+            --coral-accent: #ef4444;
+            --accent-lime: #bef264;
+            --deep-forest: #064e3b;
+            --primary-green: #10b981;
+            --earth-brown: #713f12;
+            --soft-sage: #f0fdf4;
+            --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-medium: 0 8px 24px rgba(0, 0, 0, 0.1);
         }
 
         * {
