@@ -1,0 +1,28 @@
+{
+  "name": "foodloop",
+  "version": "1.0.0",
+  "description": "FoodLoop is a real-time food sharing platform designed to connect campus and event surplus food with those in need. By leveraging modern web technology, FoodLoop aims to reduce food waste, support community sustainability, and provide easy access to nutritious meals.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adarshxz/Foodloop.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/adarshxz/Foodloop/issues"
+  },
+  "homepage": "https://github.com/adarshxz/Foodloop#readme",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "body-parser": "^2.2.2",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "sqlite3": "^5.1.7"
+  }
+}

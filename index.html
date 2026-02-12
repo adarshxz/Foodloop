@@ -13,8 +13,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <link rel="stylesheet" href="css/style.css">
-    <!-- Three.js for 3D Theme -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
+
 </head>
 
 <body>
@@ -31,11 +30,16 @@
                 <li><a href="#how-it-works">How It Works</a></li>
                 <li><a href="#impact">Impact</a></li>
                 <li><a href="#" onclick="openLoginModal(); return false;"
-                        style="background: var(--accent-lime); color: var(--deep-forest); padding: 0.6rem 1.5rem; border-radius: 25px; font-weight: 700;">Login</a>
+                        style="background: var(--primary-orange); color: white; padding: 0.6rem 1.5rem; border-radius: 25px; font-weight: 700;">Login</a>
                 </li>
             </ul>
         </div>
     </nav>
+
+    <!-- Floating Food Decorations -->
+    <div class="food-decoration food-decoration-1"></div>
+    <div class="food-decoration food-decoration-2"></div>
+    <div class="food-decoration food-decoration-3"></div>
 
     <!-- User Info Bar (shown when logged in) -->
     <div id="userInfoBar" class="user-info-bar">
@@ -327,47 +331,6 @@
         </div>
     </section>
 
-    <!-- Tech Stack -->
-    <section id="tech-stack">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">Built With Modern Technology</h2>
-                <p class="section-subtitle">Scalable, secure, and reliable infrastructure</p>
-            </div>
-            <div class="tech-grid">
-                <div class="tech-category">
-                    <h3>Frontend</h3>
-                    <ul class="tech-list">
-                        <li>HTML5 & CSS3</li>
-                        <li>JavaScript (ES6+)</li>
-                        <li>React.js</li>
-                        <li>Responsive Design</li>
-                        <li>Progressive Web App</li>
-                    </ul>
-                </div>
-                <div class="tech-category">
-                    <h3>Backend & Database</h3>
-                    <ul class="tech-list">
-                        <li>Node.js</li>
-                        <li>Express.js</li>
-                        <li>MongoDB</li>
-                        <li>RESTful API</li>
-                        <li>JWT Authentication</li>
-                    </ul>
-                </div>
-                <div class="tech-category">
-                    <h3>Cloud & Services</h3>
-                    <ul class="tech-list">
-                        <li>Firebase Cloud Messaging</li>
-                        <li>Geolocation API</li>
-                        <li>AWS / Azure / Google Cloud</li>
-                        <li>Image Processing</li>
-                        <li>Real-time Data Sync</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </section>
 
     <!-- Call to Action -->
     <section id="cta">
@@ -665,8 +628,7 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2025 FoodLoop • IDEATHON 2025 - Chameli Devi Group of Institutes, Indore • Turning Waste into
-                Worth</p>
+            <p>&copy; FoodLoop • Turning Waste into Worth</p>
         </div>
     </footer>
 
@@ -678,7 +640,7 @@
 <script src="js/auth.js"></script>
 <script src="js/map.js"></script>
 <script src="js/app.js"></script>
-<script src="js/3d-theme.js"></script>
+
 </body>
 
 </html>

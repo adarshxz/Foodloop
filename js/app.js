@@ -164,19 +164,40 @@ document.getElementById('donationForm').addEventListener('submit', function (e) 
     // Add images
     donationData.images = uploadedImages.map(img => img.file.name);
 
-    // Add to available food listings
-    availableFoodListings.unshift(donationData); // Add to beginning of array
+    // In production, this would be sent to backend
+    fetch(`${API_URL}/listings`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(donationData)
+    })
+        .then(response => response.json())
+        .then(data => {
+            donationData.id = data.id;
+            // Add to available food listings
+            availableFoodListings.unshift(donationData);
+            // Sort by distance
+            availableFoodListings.sort((a, b) => a.distance - b.distance);
 
-    // Sort by distance
-    availableFoodListings.sort((a, b) => a.distance - b.distance);
+            // Update map markers
+            if (findMap) {
+                updateMapMarkers();
+            }
 
-    // Update map markers immediately so they show up if map is open or opened later
-    if (findMap) {
-        updateMapMarkers();
-    }
+            // Show success message
+            document.getElementById('donationForm').style.display = 'none';
+            document.getElementById('successMessage').classList.add('active');
 
-    // Log the data (in production, this would be sent to backend)
-    console.log('Donation Data:', donationData);
+            // Update dashboard if it's open
+            updateDashboard();
+
+            console.log('Donation Data saved to DB:', donationData);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Something went wrong. Please try again.');
+        });
     console.log('Uploaded Images:', uploadedImages);
     console.log('Updated Food Listings:', availableFoodListings);
 
@@ -221,12 +242,13 @@ function getFoodEmoji(foodType) {
 
 // Add click handlers to all "Donate Food" and "Find Food" buttons
 document.addEventListener('DOMContentLoaded', function () {
-    // Check for saved login
-    const savedUser = localStorage.getItem('foodloopUser');
-    if (savedUser) {
-        currentUser = JSON.parse(savedUser);
-        updateUIForLoggedInUser();
-    }
+    // Fetch available food and reservations from backend
+    Promise.all([fetchListings(), fetchReservations()]).then(() => {
+        console.log('Loaded food listings and reservations from database');
+        // Update markers and UI
+        if (findMap) updateMapMarkers();
+        updateDashboard();
+    });
 
     const allButtons = document.querySelectorAll('a[href="#"]:not([class*="social-icon"])');
     allButtons.forEach(button => {
@@ -432,31 +454,44 @@ function reserveFood(foodId) {
             reservedAt: new Date().toISOString()
         };
 
-        // Mark food as reserved
-        food.reserved = true;
-        food.reservedBy = currentUser.id;
-        food.reservedByName = currentUser.name;
+        // Send reservation to backend
+        fetch(`${API_URL}/reservations`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(reservation)
+        })
+            .then(response => response.json())
+            .then(data => {
+                // Add to global reservations
+                allReservations.push(reservation);
 
-        // Store reservation first
-        let reservations = JSON.parse(localStorage.getItem('foodloopReservations') || '[]');
-        reservations.push(reservation);
-        localStorage.setItem('foodloopReservations', JSON.stringify(reservations));
+                // Mark food as reserved locally
+                food.reserved = true;
+                food.reservedBy = currentUser.id;
+                food.reservedByName = currentUser.name;
 
-        // Update dashboard if it's open
-        updateDashboard();
+                // Refresh the food listings display
+                displayFoodListings();
 
-        // Refresh the food listings display to show "Reserved" badge
-        displayFoodListings();
+                // Update map markers
+                if (findMap) {
+                    updateMapMarkers();
+                }
 
-        // Update map markers to show reserved status
-        if (findMap) {
-            updateMapMarkers();
-        }
+                // Update dashboard
+                updateDashboard();
 
-        // Show simple success alert to recipient ONLY
-        const contactInfo = food.contactNumber ? `\n\nDonor Contact: ${food.contactNumber}` : '';
-        const priceInfo = food.price ? `\nPrice: ${food.price}` : '\nPrice: Free';
-        alert(`🎉 Food Reserved Successfully!\n\nYou have reserved:\n${food.name}\n\nLocation: ${food.location}\nPickup by: ${food.bestBefore}${priceInfo}${contactInfo}\n\nThe donor has been notified. Please arrive on time for pickup.`);
+                // Show success alert
+                const contactInfo = food.contactNumber ? `\n\nDonor Contact: ${food.contactNumber}` : '';
+                const priceInfo = food.price ? `\nPrice: ${food.price}` : '\nPrice: Free';
+                alert(`🎉 Food Reserved Successfully!\n\nYou have reserved:\n${food.name}\n\nLocation: ${food.location}\nPickup by: ${food.bestBefore}${priceInfo}${contactInfo}\n\nThe donor has been notified.`);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to reserve food. Please try again.');
+            });
 
         // Log reservation data
         console.log('Food Reserved:', reservation);
@@ -561,7 +596,7 @@ filterFood = function (type) {
 // --- MAP INTEGRATION END ---
 
 function viewReservationDetails(reservationId) {
-    const reservations = JSON.parse(localStorage.getItem('foodloopReservations') || '[]');
+    const reservations = allReservations;
     const reservation = reservations.find(r => r.id === reservationId);
 
     if (reservation) {
@@ -601,28 +636,31 @@ function removeListing(foodId) {
         return;
     }
 
-    // Find the index of the food to remove
-    const index = availableFoodListings.findIndex(f => f.id === foodId);
+    // Remove from backend
+    fetch(`${API_URL}/listings/${foodId}`, {
+        method: 'DELETE'
+    })
+        .then(response => response.json())
+        .then(data => {
+            // Remove from the array locally
+            const index = availableFoodListings.findIndex(f => f.id === foodId);
+            if (index !== -1) {
+                availableFoodListings.splice(index, 1);
 
-    if (index !== -1) {
-        // Remove from the array
-        availableFoodListings.splice(index, 1);
-
-        // Update markers if map exists
-        if (findMap) {
-            updateMapMarkers();
-        }
-
-        // Refresh dashboard
-        updateDashboard();
-
-        // Refresh food listings if open
-        if (document.getElementById('findFoodModal').classList.contains('active')) {
-            displayFoodListings();
-        }
-
-        alert('Listing removed successfully.');
-    }
+                if (findMap) {
+                    updateMapMarkers();
+                }
+                updateDashboard();
+                if (document.getElementById('findFoodModal').classList.contains('active')) {
+                    displayFoodListings();
+                }
+                alert('Listing removed successfully.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to remove listing.');
+        });
 }
 
 // Close modal when clicking outside
